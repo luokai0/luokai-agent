@@ -31,7 +31,7 @@ def ask(prompt, memory=""):
         try:
             client = Groq(api_key=key_obj["key"])
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="llama3-70b-8192",
                 messages=[{"role": "user", "content": full}],
                 max_tokens=2048
             )
