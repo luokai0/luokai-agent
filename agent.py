@@ -4,10 +4,11 @@ from skills.batch_01.skills import SKILLS as BATCH01
 from skills.batch_01.emotional_intelligence import EQ_SKILLS
 from skills.batch_02.skills import SKILLS as BATCH02
 from skills.batch_03.skills import SKILLS as BATCH03
+from skills.batch_04.skills import SKILLS as BATCH04
 from skills.skill_forge.forge import forge_skill, load_forged_skills, analyze_and_forge
 
 FORGED_SKILLS = load_forged_skills()
-ALL_SKILLS = {**BATCH01, **EQ_SKILLS, **BATCH02, **BATCH03, **FORGED_SKILLS}
+ALL_SKILLS = {**BATCH01, **EQ_SKILLS, **BATCH02, **BATCH03, **BATCH04, **FORGED_SKILLS}
 
 print("=" * 50)
 print("🐉 LUO KAI AGENT — Online")
