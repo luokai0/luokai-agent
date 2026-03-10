@@ -1,0 +1,4 @@
+<|python_tag|>from core.files import list_files
+
+# Listing files in the core directory
+list_files()
