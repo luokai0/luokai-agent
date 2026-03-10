@@ -209,7 +209,7 @@ async function callGroq(msg){
       const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Authorization':'Bearer '+keys[i],'Content-Type':'application/json'},
-        body:JSON.stringify({model:'llama3-70b-8192',messages:[{role:'system',content:SOUL},...hist.slice(-10)],max_tokens:2048,temperature:0.8})
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:SOUL},...hist.slice(-10)],max_tokens:2048,temperature:0.8})
       });
       if(!r.ok){const e=await r.json();if(e.error?.code==='rate_limit_exceeded')continue;throw new Error(e.error?.message);}
       const d=await r.json();const rep=d.choices[0].message.content;
