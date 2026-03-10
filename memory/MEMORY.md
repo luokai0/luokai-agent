@@ -29,3 +29,8 @@
 [2026-03-10 08:42] Task: while True: → Done
 [2026-03-10 08:42] Task: count += 1 → Done
 [2026-03-10 08:42] Task: print(f'\n🔄 Evolution #{count}') → Done
+[2026-03-10 08:42] Task: try: → Done
+[2026-03-10 08:42] Task: with open('memory/MEMORY.md', 'r') as f: → Done
+[2026-03-10 08:42] Task: history = f.read() → Done
+[2026-03-10 08:42] Task: except: → Done
+[2026-03-10 08:42] Task: history = 'No history yet' → Done
