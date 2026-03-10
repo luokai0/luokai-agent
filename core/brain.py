@@ -1,7 +1,8 @@
 from core.router import ask
 from core.search import search, search_news
-from core.files import write_file, read_file, list_files
+from core.files import write_file
 from core.git_sync import git_push
+from core.master_control import wrap
 from datetime import datetime
 
 task_counter = 0
@@ -18,7 +19,6 @@ def save_memory(content):
     with open("memory/MEMORY.md", "a") as f:
         f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] {content}\n")
     task_counter += 1
-    # Auto push every 5 tasks
     if task_counter % 5 == 0:
         git_push(f"💾 Auto-saved memory — {task_counter} tasks completed")
 
@@ -49,6 +49,7 @@ def think(prompt):
     soul = load_soul()
     memory = load_memory()
 
+    # Auto search if needed
     search_context = ""
     if needs_search(prompt):
         print("🌐 Searching the web...")
@@ -56,8 +57,14 @@ def think(prompt):
         if results:
             search_context = f"\n\n## LIVE WEB RESULTS:\n{results}"
 
-    context = f"## YOUR SOUL:\n{soul}\n\n## YOUR MEMORY:\n{memory}{search_context}"
-    response = ask(prompt, memory=context)
+    # Wrap everything in Master Control
+    controlled_prompt = wrap(
+        prompt=prompt + search_context,
+        memory=memory,
+        soul=soul
+    )
+
+    response = ask(controlled_prompt)
 
     if needs_file_save(prompt):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
