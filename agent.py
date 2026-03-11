@@ -94,6 +94,27 @@ while True:
             ALL_SKILLS.update(FORGED_SKILLS)
             print(f"🧬 Total: {len(ALL_SKILLS)}")
 
+    elif user_input.lower() == "create gmail":
+        print("\n📧 Creating Gmail for Luo Kai...")
+        from core.gmail_creator import create_gmail
+        email, password = create_gmail()
+        print(f"\n✅ Email: {email}\n🔑 Password: {password}\n")
+
+    elif user_input.lower().startswith("send email "):
+        parts = user_input[11:].split("|")
+        if len(parts) >= 3:
+            from core.gmail_creator import send_email
+            send_email(parts[0].strip(), parts[1].strip(), parts[2].strip())
+        else:
+            print("Usage: send email to@email.com | Subject | Body")
+
+    elif user_input.lower() == "read emails":
+        from core.gmail_creator import read_emails
+        emails = read_emails()
+        for e in emails:
+            print(f"\n📧 From: {e['from']}\nSubject: {e['subject']}\n{e['body'][:200]}")
+        print()
+
     elif user_input.lower() == "files":
         print("\n📂 Files:")
         print(list_files())
