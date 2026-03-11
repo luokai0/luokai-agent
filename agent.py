@@ -68,6 +68,22 @@ while True:
         run_multi_agent(tasks_raw)
         print()
 
+    elif user_input.lower().startswith("learn "):
+        parts = user_input[6:].strip().split("|")
+        topic = parts[0].strip()
+        rounds = int(parts[1].strip()) if len(parts) > 1 else 5
+        from core.learn_from_ollama import learn_from_ollama
+        learn_from_ollama(topic, rounds)
+        print()
+
+    elif user_input.lower().startswith("learn "):
+        parts = user_input[6:].strip().split("|")
+        topic = parts[0].strip()
+        rounds = int(parts[1].strip()) if len(parts) > 1 else 5
+        from core.learn_from_ollama import learn_from_ollama
+        learn_from_ollama(topic, rounds)
+        print()
+
     elif user_input.lower() == "memory stats":
         from core.long_memory import get_stats
         stats = get_stats()
