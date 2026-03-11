@@ -56,6 +56,28 @@ while True:
             print(f"  {i}. {s}")
         print()
 
+    elif user_input.lower().startswith("run agents "):
+        goal = user_input[11:].strip()
+        from core.multi_agent import auto_decompose_and_run
+        auto_decompose_and_run(goal)
+        print()
+
+    elif user_input.lower().startswith("agents "):
+        tasks_raw = user_input[7:].strip().split("|")
+        from core.multi_agent import run_multi_agent
+        run_multi_agent(tasks_raw)
+        print()
+
+    elif user_input.lower() == "memory stats":
+        from core.long_memory import get_stats
+        stats = get_stats()
+        print(f"\n🧠 Memory Stats:")
+        print(f"  Total tasks: {stats['total_tasks']}")
+        print(f"  Wins: {stats['wins']}")
+        print(f"  Patterns: {stats['patterns']}")
+        print(f"  Top topics: {stats['top_topics']}")
+        print()
+
     elif user_input.lower() == "daily report":
         from core.money_engine import daily_money_report
         result = daily_money_report()

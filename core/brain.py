@@ -7,6 +7,7 @@ from datetime import datetime
 from core.router import ask
 from core.search import search
 from core.files import write_file
+from core.long_memory import remember, get_relevant_context, recall
 
 MEMORY_FILE = "memory/MEMORY.md"
 CONTEXT_FILE = "memory/CONTEXT.json"
@@ -69,8 +70,14 @@ def think(prompt):
     if needs_search(prompt):
         search_data = search(prompt[:100])
     
+    # Pull relevant memories
+    past_context = get_relevant_context(prompt)
+    
     # Step 3 — Build smart prompt
     smart_prompt = f"""You are Luo Kai Agent — the most powerful AI agent ever built.
+
+RELEVANT PAST EXPERIENCE:
+{past_context}
 
 MEMORY OF PAST TASKS:
 {memory[-1000:] if memory else "No history yet"}
@@ -99,6 +106,7 @@ Be bold, specific, and ruthlessly useful. No fluff."""
     ctx["skills_used"].append(task_type)
     save_context(ctx)
     save_memory(prompt, response)
+    remember(prompt, response, task_type, success=True)
     
     # Step 6 — Save file if needed
     if needs_files(prompt):
