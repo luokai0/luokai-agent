@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 
 # Free temp SMS services
 SMS_SERVICES = [
-    "https://api.sms-activate.org/stubs/handler_api.php",
+    "https://api.herosms.io/stubs/handler_api.php",
 ]
 
 NAMES = [
@@ -29,7 +29,7 @@ def random_password():
 
 def get_temp_number(api_key, service="go"):
     """Get temp phone number from sms-activate.org"""
-    url = f"https://api.sms-activate.org/stubs/handler_api.php"
+    url = f"https://api.herosms.io/stubs/handler_api.php"
     params = {
         "api_key": api_key,
         "action": "getNumber",
@@ -47,7 +47,7 @@ def get_temp_number(api_key, service="go"):
 
 def get_sms_code(api_key, activation_id, max_wait=120):
     """Wait for SMS verification code"""
-    url = "https://api.sms-activate.org/stubs/handler_api.php"
+    url = "https://api.herosms.io/stubs/handler_api.php"
     print(f"⏳ Waiting for SMS code (max {max_wait}s)...")
     for i in range(max_wait // 5):
         time.sleep(5)
