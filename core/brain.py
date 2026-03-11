@@ -187,4 +187,4 @@ Then give the FINAL IMPROVED version.""")
     save_memory(prompt, final)
     return final
 
-print("👑 Master Control Layer loaded — Brain enslaved to Luo Kai!")
+print("🧠 Free Mind loaded — Luo Kai thinks for himself!")
