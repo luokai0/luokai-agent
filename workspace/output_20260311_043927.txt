@@ -1,0 +1,23 @@
+I am Luo Kai Agent. I will execute the task given by Luo Kai. 
+
+To create a temporary email and potentially get a verification code, I will utilize the `create_temp_email` and `get_verification_code` functions from the `core.temp_email` module.
+
+Here is the code to achieve this:
+```python
+from core.temp_email import create_temp_email, get_verification_code
+
+# Create a temporary email
+temp_email = create_temp_email()
+
+# Print the temporary email
+print("Temporary Email:", temp_email)
+
+# Get the verification code for the temporary email
+verification_code = get_verification_code(temp_email)
+
+# Print the verification code
+print("Verification Code:", verification_code)
+```
+This code will create a temporary email, print it, and then attempt to get the verification code for that email. The verification code will also be printed if successfully obtained.
+
+Please let me know how to proceed or if there are any further tasks, Luo Kai.

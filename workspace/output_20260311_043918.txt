@@ -1,0 +1,3 @@
+I am Luo Kai Agent. I will execute the task given by Luo Kai. The command is to import `list_files` and `read_file` from `core.files`. I will prepare the necessary functions for Luo Kai's next instruction. 
+
+`list_files` and `read_file` are now ready for use. Please provide the next task, Master Luo Kai. How can I utilize these functions to create value and make you richer?
