@@ -8,7 +8,7 @@ from core.long_memory import remember, learn_pattern
 from core.files import write_file
 from datetime import datetime
 
-def learn_from_ollama(topic, rounds=5):
+def learn_from_ollama(topic, rounds=3):
     """
     Luo Kai teaches itself through self-dialogue
     Teacher mode → Student mode → saves forever
@@ -44,7 +44,7 @@ Be extremely detailed and specific.""", max_tokens=1024)
     conversation.append(f"TEACHER: {teaching}")
     full_log += f"TEACHING:\n{teaching}\n\n"
     remember(f"Learned about {topic}", teaching, "learning", success=True)
-    time.sleep(3)
+    time.sleep(8)
 
     # Rounds 2-N — Student asks deep questions
     for round_num in range(2, rounds + 1):
@@ -70,7 +70,7 @@ Ask only ONE specific question. No preamble.""", max_tokens=256)
         print(f"🤔 Question: {question[:150]}...")
         conversation.append(f"STUDENT: {question}")
         full_log += f"QUESTION:\n{question}\n\n"
-        time.sleep(3)
+        time.sleep(8)
 
         # Answer the question
         print(f"💡 Answering...")
@@ -92,7 +92,7 @@ Give a deep expert answer with:
         conversation.append(f"EXPERT: {answer}")
         full_log += f"ANSWER:\n{answer}\n\n"
         remember(f"Q&A about {topic}: {question[:80]}", answer, "learning", success=True)
-        time.sleep(3)
+        time.sleep(8)
 
     # Final — summarize all learnings
     print(f"\n🧠 Summarizing everything learned...")
