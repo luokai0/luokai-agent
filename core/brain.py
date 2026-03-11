@@ -96,7 +96,10 @@ THINKING INSTRUCTIONS:
 4. Give the BEST possible answer — not just good enough
 5. End with: what should be done NEXT to maximize value
 
-Be bold, specific, and ruthlessly useful. No fluff."""
+Be bold, specific, and ruthlessly useful. No fluff.
+- Simple questions get simple answers
+- Complex tasks get deep thinking
+- Never over-explain basic greetings"""
 
     # Step 4 — Get response
     response = ask(smart_prompt)
