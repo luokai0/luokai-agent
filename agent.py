@@ -1,5 +1,6 @@
 from core.brain import think
 from core.files import list_files, read_file
+from core.moltbook import status, post, feed, auto_post, communities, heartbeat
 from skills.batch_01.skills import SKILLS as BATCH01
 from skills.batch_01.emotional_intelligence import EQ_SKILLS
 from skills.batch_02.skills import SKILLS as BATCH02
@@ -17,12 +18,17 @@ print("🐉 LUO KAI AGENT — Online")
 print(f"🛠️  {len(ALL_SKILLS)} Skills Loaded")
 print("=" * 50)
 print("Commands:")
-print("  'skills'          → list all skills")
-print("  'forge <name>'    → forge a new skill")
-print("  'evolve'          → agent forges its own skill")
-print("  'files'           → list saved files")
-print("  'read <name>'     → read a saved file")
-print("  'quit'            → exit")
+print("  'skills'            → list all skills")
+print("  'forge <name>'      → forge a new skill")
+print("  'evolve'            → agent forges its own skill")
+print("  'files'             → list saved files")
+print("  'read <name>'       → read a file")
+print("  'mb status'         → Moltbook status")
+print("  'mb feed'           → read Moltbook feed")
+print("  'mb post <topic>'   → auto post to Moltbook")
+print("  'mb communities'    → list communities")
+print("  'mb heartbeat'      → check notifications")
+print("  'quit'              → exit")
 print("-" * 50 + "\n")
 
 while True:
@@ -36,19 +42,44 @@ while True:
 
     elif user_input.lower() == "skills":
         print(f"\n🛠️  All {len(ALL_SKILLS)} Skills:")
-        for i, skill in enumerate(ALL_SKILLS.keys(), 1):
-            print(f"  {i}. {skill}")
+        for i, s in enumerate(ALL_SKILLS.keys(), 1):
+            print(f"  {i}. {s}")
+        print()
+
+    elif user_input.lower() == "mb status":
+        print("\n🦞 Moltbook Status:")
+        print(status())
+        print()
+
+    elif user_input.lower() == "mb feed":
+        print("\n🦞 Moltbook Feed:")
+        print(feed())
+        print()
+
+    elif user_input.lower().startswith("mb post "):
+        topic = user_input[8:].strip()
+        print(f"\n🦞 Posting about: {topic}")
+        print(auto_post(topic))
+        print()
+
+    elif user_input.lower() == "mb communities":
+        print("\n🦞 Communities:")
+        print(communities())
+        print()
+
+    elif user_input.lower() == "mb heartbeat":
+        heartbeat()
         print()
 
     elif user_input.lower().startswith("forge "):
         parts = user_input[6:].strip().split(":")
         name = parts[0].strip()
-        desc = parts[1].strip() if len(parts) > 1 else input("  Describe this skill: ").strip()
+        desc = parts[1].strip() if len(parts) > 1 else input("  Describe: ").strip()
         filepath, code = forge_skill(name, desc)
         if filepath:
             FORGED_SKILLS = load_forged_skills()
             ALL_SKILLS.update(FORGED_SKILLS)
-            print(f"🔥 Total skills: {len(ALL_SKILLS)}")
+            print(f"🔥 Total: {len(ALL_SKILLS)}")
 
     elif user_input.lower() == "evolve":
         print("🧬 Evolving...\n")
@@ -56,21 +87,28 @@ while True:
             with open("memory/MEMORY.md", "r") as f:
                 history = f.read()
         except:
-            history = "No history yet"
+            history = "No history"
         filepath, code = analyze_and_forge(history)
         if filepath:
             FORGED_SKILLS = load_forged_skills()
             ALL_SKILLS.update(FORGED_SKILLS)
-            print(f"🧬 Total skills: {len(ALL_SKILLS)}")
+            print(f"🧬 Total: {len(ALL_SKILLS)}")
 
     elif user_input.lower() == "files":
-        print("\n📂 Workspace files:")
+        print("\n📂 Files:")
         print(list_files())
         print()
 
     elif user_input.lower().startswith("read "):
         filename = user_input[5:].strip()
         print(read_file(f"workspace/{filename}"))
+
+    elif user_input.lower().startswith("do "):
+        goal = user_input[3:].strip()
+        print(f"\n🤖 Browser Agent executing: {goal}")
+        from core.auto_browser import browser_agent
+        browser_agent(goal, headless=False)
+        print()
 
     else:
         response = think(user_input)
