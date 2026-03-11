@@ -1,142 +1,132 @@
-# 🐉 LUO KAI — LEARNS FROM OLLAMA
-# Luo Kai and Ollama have a deep conversation
-# Luo Kai saves everything he learns forever
+# 🐉 LUO KAI — SELF LEARNING SYSTEM
+# Uses Groq to teach itself any topic
+# Saves everything to long term memory forever
 
-import requests
 import time
 from core.router import ask_groq
 from core.long_memory import remember, learn_pattern
 from core.files import write_file
 from datetime import datetime
 
-def ollama_think(prompt):
-    """Get Ollama's thoughts"""
-    try:
-        response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "llama3.2",
-                "prompt": prompt,
-                "stream": False,
-                "options": {"num_predict": 1024}
-            },
-            timeout=120
-        )
-        if response.status_code == 200:
-            return response.json().get("response", "")
-    except Exception as e:
-        return f"Ollama error: {e}"
-    return ""
-
 def learn_from_ollama(topic, rounds=5):
     """
-    Luo Kai and Ollama have a conversation about a topic
-    Both learn from each other
-    Everything saved to long term memory
+    Luo Kai teaches itself through self-dialogue
+    Teacher mode → Student mode → saves forever
     """
-    print(f"\n🧠 LUO KAI LEARNING SESSION")
+    print(f"\n🧠 LUO KAI SELF LEARNING SESSION")
     print(f"📚 Topic: {topic}")
     print(f"🔄 Rounds: {rounds}")
     print("=" * 50)
 
-    conversation = []
     full_log = f"LEARNING SESSION — {datetime.now().strftime('%Y-%m-%d %H:%M')}\nTopic: {topic}\n\n"
+    conversation = []
 
-    # Round 1 — Ollama shares what it knows
-    print(f"\n🖥️  Round 1: Ollama teaches...")
-    ollama_response = ollama_think(f"""You are a wise teacher. 
-Teach everything you know about: {topic}
-Be detailed, specific, and include:
-- Core concepts
-- Advanced insights  
-- Practical applications
+    # Round 1 — Teacher mode: dump everything known
+    print(f"\n📖 Round 1: Teaching phase...")
+    teaching = ask_groq(f"""You are an expert teacher. 
+Teach everything important about: {topic}
+
+Include:
+- Core concepts and fundamentals
+- Advanced insights most people miss
+- Practical real world applications
 - Common mistakes to avoid
-- Hidden knowledge most people miss""")
+- Hidden knowledge and secrets
+- How to use this to make money
 
-    print(f"🖥️  Ollama: {ollama_response[:200]}...")
-    conversation.append({"speaker": "Ollama", "text": ollama_response})
-    full_log += f"OLLAMA TEACHES:\n{ollama_response}\n\n"
+Be extremely detailed and specific.""", max_tokens=1024)
 
-    # Save first lesson to memory
-    remember(f"Ollama taught about {topic}", ollama_response, "learning", success=True)
+    if not teaching:
+        print("⚠️ Groq rate limited — try again in a minute!")
+        return
 
-    # Rounds 2-N — Luo Kai asks questions, Ollama answers
+    print(f"📖 Taught: {teaching[:150]}...")
+    conversation.append(f"TEACHER: {teaching}")
+    full_log += f"TEACHING:\n{teaching}\n\n"
+    remember(f"Learned about {topic}", teaching, "learning", success=True)
+    time.sleep(3)
+
+    # Rounds 2-N — Student asks deep questions
     for round_num in range(2, rounds + 1):
-        time.sleep(2)  # be gentle with APIs
-
-        # Luo Kai generates smart questions based on what it learned
-        print(f"\n🐉 Round {round_num}: Luo Kai asks...")
-        prev_knowledge = "\n".join([f"{c['speaker']}: {c['text'][:300]}" for c in conversation[-2:]])
+        print(f"\n🤔 Round {round_num}: Asking deep question...")
         
-        luokai_question = ask_groq(f"""Based on this conversation about {topic}:
-{prev_knowledge}
+        prev = "\n".join(conversation[-2:])
+        
+        question = ask_groq(f"""Based on this knowledge about {topic}:
+{prev[-1000:]}
 
-Generate the most insightful follow-up question that will uncover deeper knowledge.
-Ask ONE specific, deep question only. No preamble.""", max_tokens=256)
+Generate ONE deeply insightful question that will uncover:
+- Hidden connections
+- Practical money-making applications  
+- Things most people never think about
 
-        if not luokai_question:
-            luokai_question = f"What are the most practical applications of {topic} for making money?"
+Ask only ONE specific question. No preamble.""", max_tokens=256)
 
-        print(f"🐉 Luo Kai asks: {luokai_question[:200]}")
-        conversation.append({"speaker": "Luo Kai", "text": luokai_question})
-        full_log += f"LUO KAI ASKS:\n{luokai_question}\n\n"
+        if not question:
+            print("⚠️ Skipping round — rate limited")
+            time.sleep(10)
+            continue
 
-        # Ollama answers
-        time.sleep(2)
-        print(f"🖥️  Ollama answers...")
-        ollama_answer = ollama_think(f"""Previous context about {topic}:
-{prev_knowledge}
+        print(f"🤔 Question: {question[:150]}...")
+        conversation.append(f"STUDENT: {question}")
+        full_log += f"QUESTION:\n{question}\n\n"
+        time.sleep(3)
 
-Question: {luokai_question}
+        # Answer the question
+        print(f"💡 Answering...")
+        answer = ask_groq(f"""Topic: {topic}
+Question: {question}
+Context: {teaching[:500]}
 
-Give a deep, specific, expert answer. Include examples and actionable insights.""")
+Give a deep expert answer with:
+- Specific examples
+- Actionable insights
+- Money making angles
+- Surprising facts""", max_tokens=768)
 
-        print(f"🖥️  Ollama: {ollama_answer[:200]}...")
-        conversation.append({"speaker": "Ollama", "text": ollama_answer})
-        full_log += f"OLLAMA ANSWERS:\n{ollama_answer}\n\n"
+        if not answer:
+            time.sleep(10)
+            continue
 
-        # Save each round to memory
-        remember(
-            f"Round {round_num}: {luokai_question[:100]}", 
-            ollama_answer, 
-            "learning", 
-            success=True
-        )
+        print(f"💡 Answer: {answer[:150]}...")
+        conversation.append(f"EXPERT: {answer}")
+        full_log += f"ANSWER:\n{answer}\n\n"
+        remember(f"Q&A about {topic}: {question[:80]}", answer, "learning", success=True)
+        time.sleep(3)
 
-    # Final round — Luo Kai summarizes what he learned
-    print(f"\n🐉 Final: Luo Kai summarizes learnings...")
-    full_conversation = "\n".join([f"{c['speaker']}: {c['text'][:400]}" for c in conversation])
+    # Final — summarize all learnings
+    print(f"\n🧠 Summarizing everything learned...")
+    full_text = "\n".join(conversation)
     
-    summary = ask_groq(f"""You just had a deep learning conversation about: {topic}
+    summary = ask_groq(f"""You just completed a deep learning session about: {topic}
 
-Full conversation:
-{full_conversation[:3000]}
+Full session:
+{full_text[:3000]}
 
-Now:
-1. Summarize the TOP 10 most important things you learned
-2. Identify 3 patterns you noticed
-3. List 5 ways to USE this knowledge to make money
-4. What should you learn next?
+Create your permanent memory summary:
+1. TOP 10 most important things learned
+2. 3 surprising insights
+3. 5 ways to USE this knowledge to make money RIGHT NOW
+4. What to learn next about this topic
+5. One sentence summary for quick recall
 
-This is your permanent memory — make it count.""", max_tokens=1024)
+This is saved to your long term memory forever — make it count.""", max_tokens=1024)
 
-    if not summary:
-        summary = f"Learned about {topic} from Ollama in {rounds} rounds."
+    if summary:
+        print(f"\n🧠 Summary: {summary[:300]}...")
+        remember(f"MASTER SUMMARY: {topic}", summary, "learning_summary", success=True)
+        learn_pattern(f"Deep knowledge: {topic}", summary[:300])
+        full_log += f"MASTER SUMMARY:\n{summary}\n"
 
-    print(f"\n🐉 Luo Kai learned:\n{summary[:500]}...")
-    full_log += f"LUO KAI'S SUMMARY:\n{summary}\n"
-
-    # Save summary to long term memory
-    remember(f"LEARNED: {topic}", summary, "learning_summary", success=True)
-    learn_pattern(f"Knowledge about {topic}", summary[:300])
-
-    # Save full session to file
+    # Save full session
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"learning_{topic[:30].replace(' ','_')}_{ts}.txt"
     write_file(filename, full_log)
-    print(f"\n💾 Full session saved: workspace/{filename}")
-    print(f"\n✅ Learning complete! Luo Kai now knows {topic} deeply!")
+    
+    print(f"\n💾 Saved: workspace/{filename}")
+    print(f"✅ Luo Kai now knows {topic} deeply!")
+    print(f"🧠 Saved to long term memory forever!")
     
     return summary
 
-print("📚 Learn from Ollama module loaded!")
+print("📚 Self Learning System loaded!")

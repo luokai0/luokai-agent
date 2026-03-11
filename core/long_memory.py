@@ -66,7 +66,7 @@ def recall(query, limit=5):
         score = len(query_words & task_words)
         if score > 0:
             scored.append((score, win))
-    scored.sort(reverse=True)
+    scored.sort(key=lambda x: x[0], reverse=True)
     return [w for _, w in scored[:limit]]
 
 def learn_pattern(pattern, outcome):
