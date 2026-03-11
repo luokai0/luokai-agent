@@ -1,7 +1,4 @@
 # 🐉 LUO KAI — MEGA ROUTER
-# 5 AI providers, 43 keys, never stops thinking
-# Priority: Cerebras → Groq → Gemini → Mistral → OpenRouter → Ollama
-
 import os
 import time
 import requests
@@ -10,14 +7,12 @@ from core.master_control import MASTER_LAWS
 
 load_dotenv()
 
-# Load all keys
 CEREBRAS_KEYS = [os.getenv(f"CEREBRAS_API_KEY_{i}") for i in range(1,10) if os.getenv(f"CEREBRAS_API_KEY_{i}")]
 GROQ_KEYS = [os.getenv(f"GROQ_API_KEY_{i}") for i in range(1,51) if os.getenv(f"GROQ_API_KEY_{i}")]
 GEMINI_KEYS = [os.getenv(f"GEMINI_API_KEY_{i}") for i in range(1,20) if os.getenv(f"GEMINI_API_KEY_{i}")]
 MISTRAL_KEYS = [os.getenv(f"MISTRAL_API_KEY_{i}") for i in range(1,10) if os.getenv(f"MISTRAL_API_KEY_{i}")]
 OPENROUTER_KEYS = [os.getenv(f"OPENROUTER_API_KEY_{i}") for i in range(1,10) if os.getenv(f"OPENROUTER_API_KEY_{i}")]
 
-# Key rotation indexes
 idx = {"cerebras": 0, "groq": 0, "gemini": 0, "mistral": 0, "openrouter": 0}
 cooldowns = {}
 
@@ -38,7 +33,6 @@ def next_key(keys, provider):
 
 print(f"🔑 Loaded: {len(CEREBRAS_KEYS)} Cerebras | {len(GROQ_KEYS)} Groq | {len(GEMINI_KEYS)} Gemini | {len(MISTRAL_KEYS)} Mistral | {len(OPENROUTER_KEYS)} OpenRouter")
 
-# ─── CEREBRAS ───────────────────────────────────────────
 def ask_cerebras(prompt, max_tokens=2048):
     if not CEREBRAS_KEYS:
         return None
@@ -64,7 +58,6 @@ def ask_cerebras(prompt, max_tokens=2048):
             print(f"⚠️ Cerebras key {num}: {err[:50]}")
         return None
 
-# ─── GROQ ────────────────────────────────────────────────
 def ask_groq(prompt, max_tokens=2048, temperature=0.8):
     if not GROQ_KEYS:
         return None
@@ -91,7 +84,6 @@ def ask_groq(prompt, max_tokens=2048, temperature=0.8):
             print(f"⚠️ Groq key {num}: {err[:50]}")
         return None
 
-# ─── GEMINI ──────────────────────────────────────────────
 def ask_gemini(prompt, max_tokens=2048):
     if not GEMINI_KEYS:
         return None
@@ -99,22 +91,23 @@ def ask_gemini(prompt, max_tokens=2048):
     if not key:
         return None
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=key)
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        response = model.generate_content(f"{MASTER_LAWS}\n\nTask: {prompt}")
-        print(f"🔵 Gemini key {num} responded!")
-        return response.text
-    except Exception as e:
-        err = str(e)
-        if "429" in err or "quota" in err.lower() or "rate" in err.lower():
+        response = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={key}",
+            json={"contents": [{"parts": [{"text": f"{MASTER_LAWS}\n\nTask: {prompt}"}]}]},
+            timeout=30
+        )
+        data = response.json()
+        if "candidates" in data:
+            print(f"🔵 Gemini key {num} responded!")
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        else:
             cooldown(key, 60)
             print(f"⏸️ Gemini key {num} cooling...")
-        else:
-            print(f"⚠️ Gemini key {num}: {err[:50]}")
+            return None
+    except Exception as e:
+        print(f"⚠️ Gemini key {num}: {str(e)[:50]}")
         return None
 
-# ─── MISTRAL ─────────────────────────────────────────────
 def ask_mistral(prompt, max_tokens=2048):
     if not MISTRAL_KEYS:
         return None
@@ -140,7 +133,6 @@ def ask_mistral(prompt, max_tokens=2048):
             print(f"⚠️ Mistral key {num}: {err[:50]}")
         return None
 
-# ─── OPENROUTER ──────────────────────────────────────────
 def ask_openrouter(prompt, max_tokens=2048):
     if not OPENROUTER_KEYS:
         return None
@@ -169,7 +161,6 @@ def ask_openrouter(prompt, max_tokens=2048):
         print(f"⚠️ OpenRouter key {num}: {str(e)[:50]}")
         return None
 
-# ─── OLLAMA (local fallback) ─────────────────────────────
 def ask_ollama(prompt, max_tokens=1024):
     try:
         response = requests.post(
@@ -184,34 +175,19 @@ def ask_ollama(prompt, max_tokens=1024):
         pass
     return None
 
-# ─── MEGA ROUTER ─────────────────────────────────────────
 def ask(prompt, max_tokens=2048, temperature=0.8):
-    """Try all providers in order — never fails"""
-    
-    # 1. Cerebras (fastest)
     result = ask_cerebras(prompt, max_tokens)
     if result: return result
-    
-    # 2. Groq (smartest free)
     result = ask_groq(prompt, max_tokens, temperature)
     if result: return result
-    
-    # 3. Gemini (Google)
     result = ask_gemini(prompt, max_tokens)
     if result: return result
-    
-    # 4. Mistral (1B tokens/month)
     result = ask_mistral(prompt, max_tokens)
     if result: return result
-    
-    # 5. OpenRouter (30+ free models)
     result = ask_openrouter(prompt, max_tokens)
     if result: return result
-    
-    # 6. Ollama local (always free)
     result = ask_ollama(prompt, max_tokens)
     if result: return result
-    
     return "❌ All providers exhausted. Wait a moment."
 
 def ask_fast(prompt, max_tokens=512, temperature=0.7):
@@ -220,4 +196,4 @@ def ask_fast(prompt, max_tokens=512, temperature=0.7):
 def ask_deep(prompt, max_tokens=4096, temperature=0.9):
     return ask(prompt, max_tokens=max_tokens, temperature=temperature)
 
-print("🚀 MEGA ROUTER ready — 5 providers, never stops thinking!")
+print("🚀 MEGA ROUTER ready — 6 providers, never stops thinking!")

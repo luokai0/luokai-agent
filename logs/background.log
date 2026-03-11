@@ -1,0 +1,8 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "/workspaces/codespaces-blank/background.py", line 9, in <module>
+    from core.router import ask
+  File "/workspaces/codespaces-blank/core/router.py", line 105
+    response = client.models.generate_content(model="gemini-2.0-flash", contents(f"{MASTER_LAWS}\n\nTask: {prompt}")
+                                             ^
+SyntaxError: '(' was never closed
