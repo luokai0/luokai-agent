@@ -1,0 +1,5 @@
+first_name: Ethan
+last_name: Hall
+username: ethanhall90
+password: LuoKai@2026!
+email: creationslous@gmail.com

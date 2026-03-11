@@ -104,13 +104,28 @@ while True:
     elif user_input.lower().startswith("signup "):
         parts = user_input[7:].split("|")
         if len(parts) >= 2:
+            from core.web_signup import signup_to_site
+            signup_to_site(parts[0].strip(), parts[1].strip())
+        else:
+            print("Usage: signup https://site.com | sitename")
+        print()
+        continue
+        parts = user_input[7:].split("|")
+        if len(parts) >= 2:
             url = parts[0].strip()
             name = parts[1].strip()
             print(f"\n🤖 Signing up to {name}...")
-            profile = signup_with_temp_email(url, name)
-            print(f"✅ Profile created and saved!")
-        else:
-            print("Usage: signup https://site.com | sitename")
+
+    elif user_input.lower() == "money sites":
+        from core.money_sites import print_money_sites
+        print_money_sites()
+        print()
+
+    elif user_input.lower().startswith("signup all"):
+        parts = user_input.split(" ")
+        limit = int(parts[2]) if len(parts) > 2 else 5
+        from core.money_sites import signup_all
+        signup_all(limit)
         print()
 
     elif user_input.lower() == "mb status":
